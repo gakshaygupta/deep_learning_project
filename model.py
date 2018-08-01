@@ -1,0 +1,41 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Sun Jul 29 14:13:41 2018
+
+@author: Akshay
+"""
+
+from tensorflow import keras
+import pickle
+from sklearn import cross_validation
+import matplotlib.pyplot as plt
+plt.imshow(X[0])
+import numpy as np
+import generator
+#importing the training and testing data 
+k=open(r"C:\Users\Akshay\Desktop\New folder (2)\dataset.plk","rb")
+dataset=pickle.load(k)
+X=[]
+Y=[]
+for i in dataset:
+        X.append(i[0])
+        Y.append(i[1])
+data=generator.train_test_generator(X,Y,20,3)
+X_train,X_test,Y_train,Y_test=data      
+#The model
+model=keras.models.Sequential()
+Conv2d=keras.layers.Conv2D
+GRU=keras.layers.GRU
+pooling=keras.layers.AveragePooling2D
+model.add(Conv2d(32,[96,4],input_shape=[96,128,3]))
+#model.add(pooling(pool_size=(5,5)))
+#model.add(Conv2d(64,[10,10]))
+#model.add(Conv2d(32,[9,2]))
+model.add(keras.layers.Reshape([125,32]))
+model.add(GRU(100))
+#model.add(keras.layers.Reshape([100,1]))
+#model.add(GRU(50))
+model.add(keras.layers.Dense(100,activation="relu"))
+model.add(keras.layers.Dense(3,activation="softmax"))
+model.compile("Adagrad",loss='categorical_crossentropy',metrics=["accuracy"])
+model.fit(np.array(X_train),np.array(Y_train),1,500,validation_data=[np.array(X_test),np.array(Y_test)],shuffle=True)
