@@ -9,9 +9,10 @@ from tensorflow import keras
 import pickle
 from sklearn import cross_validation
 import matplotlib.pyplot as plt
-plt.imshow(X[0])
+
 import numpy as np
 import generator
+from imblearn.over_sampling import SMOTE, ADASYN
 #importing the training and testing data 
 k=open(r"C:\Users\Akshay\Desktop\New folder (2)\dataset.plk","rb")
 dataset=pickle.load(k)
@@ -20,18 +21,27 @@ Y=[]
 for i in dataset:
         X.append(i[0])
         Y.append(i[1])
+     
 data=generator.train_test_generator(X,Y,20,3)
 X_train,X_test,Y_train,Y_test=data      
 #The model
 model=keras.models.Sequential()
 Conv2d=keras.layers.Conv2D
 GRU=keras.layers.GRU
+Dropout=keras.layers.Dropout
 pooling=keras.layers.AveragePooling2D
-model.add(Conv2d(32,[96,4],input_shape=[96,128,3]))
-#model.add(pooling(pool_size=(5,5)))
-#model.add(Conv2d(64,[10,10]))
-#model.add(Conv2d(32,[9,2]))
-model.add(keras.layers.Reshape([125,32]))
+model.add(Conv2d(32,[4,4],input_shape=[96,128,3],activation="relu"))
+model.add(Dropout(0.1))
+model.add(pooling(pool_size=(2,2)))
+model.add(Conv2d(64,[5,5],activation="relu"))
+model.add(Dropout(0.1))
+model.add(pooling(pool_size=(3,3)))
+model.add(Conv2d(32,[3,3],activation="relu"))
+model.add(Dropout(0.1))
+model.add(pooling(pool_size=(2,2)))
+model.add(Conv2d(32,[6,1],activation="relu"))
+model.add(Dropout(0.1))
+model.add(keras.layers.Reshape([8,32]))
 model.add(GRU(100))
 #model.add(keras.layers.Reshape([100,1]))
 #model.add(GRU(50))
